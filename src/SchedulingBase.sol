@@ -100,12 +100,16 @@ abstract contract SchedulingBase is ERC7579ExecutorBase {
         uint256 jobId = accountJobCount[account] + 1;
         accountJobCount[account]++;
 
+        // prevent user from supplying an invalid number of execution (0)
+        uint16 nrOfExecution = uint16(bytes2(orderData[6:8]));
+        if (nrOfExecution == 0) revert InvalidExecution();
+
         executionLog[account][jobId] = ExecutionConfig({
             numberOfExecutionsCompleted: 0,
             isEnabled: true,
             lastExecutionTime: 0,
             executeInterval: uint48(bytes6(orderData[0:6])),
-            numberOfExecutions: uint16(bytes2(orderData[6:8])),
+            numberOfExecutions: nrOfExecutions,
             startDate: uint48(bytes6(orderData[8:14])),
             executionData: orderData[14:]
         });
